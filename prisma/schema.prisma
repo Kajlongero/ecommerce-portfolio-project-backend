@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id                  String                @id @default(uuid())
+  profile             Profile?
+  auth                Auth?
+  createdAt           DateTime              @default(now()) @map("created_at")
+  updatedAt           DateTime              @updatedAt @map("updated_at")
+  activeSessions      ActiveSessions[]
+  blacklistedSessions BlacklistedSessions[]
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  address   String?
+  birthDate String?  @map("birth_date")
+  balance   Float    @default(0.00)
+  userId    String   @unique @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      Users    @relation(fields: [userId], references: [id])
+}
+
+model Auth {
+  id                            String         @id @default(uuid())
+  email                         String         @unique @db.VarChar(120)
+  password                      String         @db.VarChar(150)
+  confirmed                     Boolean        @default(false)
+  blocked                       Boolean        @default(false)
+  canLogin                      Boolean        @default(true) @map("can_login")
+  timeToLoginAgain              DateTime?      @map("time_to_login_again")
+  timeToRequestPasswordRecovery DateTime?      @map("time_to_request_password_recovery")
+  loginAttempts                 Int            @default(0) @map("login_attempts")
+  passwordRecoveryAttempts      Int            @default(0) @map("password_recovery_attempts")
+  userId                        String         @unique @map("user_id")
+  roleId                        Int            @map("role_id")
+  createdAt                     DateTime       @default(now()) @map("created_at")
+  updatedAt                     DateTime       @updatedAt @map("updated_at")
+  deletedAt                     DateTime?      @map("deleted_at")
+  role                          Roles          @relation(fields: [roleId], references: [id])
+  Users                         Users          @relation(fields: [userId], references: [id])
+  AuthRecovery                  AuthRecovery[]
+}
+
+model ActiveSessions {
+  id        String   @id @default(uuid())
+  active    Boolean  @default(true)
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  Users     Users    @relation(fields: [userId], references: [id])
+}
+
+model BlacklistedSessions {
+  id        String  @id
+  hasLogout Boolean @default(false) @map("has_logout")
+  isExpired Boolean @default(false) @map("is_expired")
+  userId    String  @map("user_id")
+  Users     Users   @relation(fields: [userId], references: [id])
+}
+
+model AuthRecovery {
+  id             String   @id
+  code           Int
+  valid          Boolean  @default(false)
+  authId         String   @map("auth_id")
+  changeAttempts Int      @default(0) @map("change_attempts")
+  requestedAt    DateTime @map("requested_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  auth           Auth     @relation(fields: [authId], references: [id])
+}
+
+model Permissions {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  roles     Roles[]
+}
+
+model Roles {
+  id          Int           @id @default(autoincrement())
+  name        String
+  permissions Permissions[]
+  Auth        Auth[]
+}

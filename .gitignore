@@ -1,0 +1,10 @@
+/node_modules/
+.env 
+
+schema_copy.prisma
+permissions.txt
+
+migrations/
+
+*.sql
+/sql/

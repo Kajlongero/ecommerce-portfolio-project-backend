@@ -5,11 +5,11 @@ const {
   BoomErrorHandler,
   TypeErrorHandler,
   ServerErrorHandler,
-} = require("./middlewares/errors.handlers");
+} = require("./middlewares/errors.handler");
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const apiRouting = require("./components/Main/route");
+const apiRouting = require("./components/route");
 
 const httpServer = createServer(app);
 

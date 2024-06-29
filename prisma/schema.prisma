@@ -18,16 +18,18 @@ model Users {
 }
 
 model Profile {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  address   String?
-  birthDate String?  @map("birth_date")
-  balance   Float    @default(0.00)
-  userId    String   @unique @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  user      Users    @relation(fields: [userId], references: [id])
+  id           Int      @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  address      String?
+  birthDate    String?  @map("birth_date")
+  coverImageId String?  @map("cover_image_id")
+  CoverImage   Images?  @relation(fields: [coverImageId], references: [id])
+  balance      Float    @default(0.00)
+  userId       String   @unique @map("user_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  user         Users    @relation(fields: [userId], references: [id])
 }
 
 model Auth {
@@ -38,9 +40,11 @@ model Auth {
   blocked                       Boolean        @default(false)
   canLogin                      Boolean        @default(true) @map("can_login")
   timeToLoginAgain              DateTime?      @map("time_to_login_again")
-  timeToRequestPasswordRecovery DateTime?      @map("time_to_request_password_recovery")
   loginAttempts                 Int            @default(0) @map("login_attempts")
+  timeToRequestPasswordRecovery DateTime?      @map("time_to_request_password_recovery")
   passwordRecoveryAttempts      Int            @default(0) @map("password_recovery_attempts")
+  requestConfirmAttempts        Int            @default(0)
+  timeToRequestConfirm          DateTime?      @map("time_to_request_confirm")
   userId                        String         @unique @map("user_id")
   roleId                        Int            @map("role_id")
   createdAt                     DateTime       @default(now()) @map("created_at")
@@ -49,6 +53,7 @@ model Auth {
   role                          Roles          @relation(fields: [roleId], references: [id])
   Users                         Users          @relation(fields: [userId], references: [id])
   AuthRecovery                  AuthRecovery[]
+  AuthConfirm                   AuthConfirm[]
 }
 
 model ActiveSessions {
@@ -72,10 +77,22 @@ model AuthRecovery {
   code           Int
   valid          Boolean  @default(false)
   authId         String   @map("auth_id")
+  iv             String
+  tag            Bytes
   changeAttempts Int      @default(0) @map("change_attempts")
   requestedAt    DateTime @map("requested_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
   auth           Auth     @relation(fields: [authId], references: [id])
+}
+
+model AuthConfirm {
+  id          String   @id
+  valid       Boolean  @default(false)
+  authId      String   @map("auth_id")
+  iv          String
+  tag         Bytes
+  requestedAt DateTime @map("requested_at")
+  auth        Auth     @relation(fields: [authId], references: [id])
 }
 
 model Permissions {
@@ -91,4 +108,14 @@ model Roles {
   name        String
   permissions Permissions[]
   Auth        Auth[]
+}
+
+model Images {
+  id        String    @id
+  uri       String
+  width     Int?
+  height    Int?
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+  Profile   Profile[]
 }

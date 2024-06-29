@@ -2,6 +2,7 @@ const { Server } = require("socket.io");
 const { createServer } = require("http");
 const { serverConfigs } = require("./configs/server.configs");
 const {
+  MulterErrorHandler,
   BoomErrorHandler,
   TypeErrorHandler,
   ServerErrorHandler,
@@ -26,6 +27,7 @@ app.use(cors());
 
 apiRouting(app);
 
+app.use(MulterErrorHandler);
 app.use(TypeErrorHandler);
 app.use(BoomErrorHandler);
 app.use(ServerErrorHandler);

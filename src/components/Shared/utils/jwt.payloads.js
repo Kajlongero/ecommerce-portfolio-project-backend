@@ -7,7 +7,7 @@ const AccessTokenPayload = (user) => ({
   sub: user.auth.id,
   uid: user.id,
   aud: ["http://localhost:3001/api/v1"],
-  roles: [user.auth.role.name],
+  role: [user.auth.role.name],
 });
 
 /** Payload for the Refresh Token
@@ -21,7 +21,15 @@ const RefreshTokenPayload = (user, rId) => ({
   aud: ["http://localhost:3001/api/v1"],
 });
 
+const PasswordChangeTokenPayload = (user, rId) => ({
+  sub: user.auth.id,
+  uid: user.id,
+  rid: rId,
+  aud: ["http://localhost:3001/api/v1/auth/request-change/change-password"],
+});
+
 module.exports = {
   AccessTokenPayload,
   RefreshTokenPayload,
+  PasswordChangeTokenPayload,
 };

@@ -24,16 +24,26 @@ const compareDates = (date) => {
  */
 
 const isoTimeByAttempts = (attempts) => {
-  if (attempts !== "number") throw new badData();
+  if (typeof attempts !== "number") throw new badData();
 
   const date = new Date();
   const calc = Math.pow(attempts, 2);
 
-  date.setMinutes(date.getTime() + calc);
+  console.log(calc);
+
+  date.setMinutes(date.getMinutes() + calc * 4);
+  return date.toISOString();
+};
+
+const setMinutesISOTime = (minutes = 15) => {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() + minutes);
+
   return date.toISOString();
 };
 
 module.exports = {
   isoTimeByAttempts,
   compareDates,
+  setMinutesISOTime,
 };

@@ -1,12 +1,26 @@
+/** Simple where id object for Prisma ORM
+ * @param {string} id
+ * @returns {{
+ *  where: {
+ *    id: string
+ *  }
+ * }}
+ */
 const WhereId = (id) => ({
   where: {
     id: id,
   },
 });
 
-/** Simple where name object for Prisma ORM
+/** Simple where name is equal object for Prisma ORM
  * @param {string } name
- * @returns {object}
+ * @returns {{
+ *  where: {
+ *    name: {
+ *      equals: string
+ *    }
+ *  }
+ * }}
  */
 const WhereName = (name) => ({
   where: {
@@ -16,6 +30,14 @@ const WhereName = (name) => ({
   },
 });
 
+/** Simple where userId object for Prisma ORM
+ * @param {string} id
+ * @returns {{
+ *  where: {
+ *    userId: string
+ *  }
+ * }}
+ */
 const WhereUserId = (id) => ({
   where: {
     userId: id,

@@ -1,0 +1,10 @@
+INSERT INTO "Roles" (name) VALUES
+  ('OWNER'),
+  ('ADMIN'),
+  ('ADMINISTRATIVE'),
+  ('CUSTOMER_SERVICE'),
+  ('INVENTORY_MANAGER'),
+  ('CUSTOMER'),
+  ('VIP'),
+  ('PARTNER'),
+  ('ANONYMOUS');

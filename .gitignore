@@ -1,10 +1,7 @@
+# general purposes
 /node_modules/
 .env 
 
+# prisma
 schema_copy.prisma
-permissions.txt
-
 migrations/
-
-*.sql
-/sql/

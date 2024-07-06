@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -111,11 +112,41 @@ model Roles {
 }
 
 model Images {
-  id        String    @id
+  id        String     @id
   uri       String
   width     Int?
   height    Int?
-  createdAt DateTime  @default(now()) @map("created_at")
-  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime   @default(now()) @map("created_at")
+  deletedAt DateTime?  @map("deleted_at")
   Profile   Profile[]
+  Products  Products[]
+}
+
+model Products {
+  id           Int          @id @default(autoincrement())
+  name         String
+  description  String       @default("No description provided.")
+  sku          String
+  price        Float        @default(0.00)
+  stock        Int?         @default(0)
+  weight       Float?       @default(0.00)
+  dimensions   String?
+  color        String?
+  coverImageId String?       @map("cover_image_id")
+  active       Boolean      @default(true)
+  votes        Int
+  votesAverage Float
+  createdAt    DateTime     @default(now()) @map("created_at")
+  deletedAt    DateTime?    @map("deleted_at")
+  Images       Images[] 
+  Categories   Categories[]
+}
+
+model Categories {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  deletedAt DateTime?  @map("deleted_at")
+  Products  Products[]
 }

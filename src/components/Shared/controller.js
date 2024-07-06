@@ -87,6 +87,21 @@ class SharedController {
 
     return user;
   }
+
+  async getPermissionsAndValidate(user, permissionExpected) {
+    const existsUser = await prisma.users.findUnique(WhereId(user.uid));
+    if (!existsUser)
+      throw new boom.unauthorized(RESPONSE_MESSAGES.UNAUTHORIZED_ACTION);
+
+    const permissions = await this.getRolePermissions(user.role[0]);
+    if (permissions && !permissions.length)
+      throw new unauthorized(RESPONSE_MESSAGES.UNAUTHORIZED_ROLE);
+
+    if (!allowed(permissions, permissionExpected))
+      throw new boom.unauthorized(RESPONSE_MESSAGES.UNAUTHORIZED_ACTION);
+
+    return { user: existsUser, permissions: permissions };
+  }
 }
 
 module.exports = SharedController;

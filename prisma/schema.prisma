@@ -132,13 +132,13 @@ model Products {
   weight       Float?       @default(0.00)
   dimensions   String?
   color        String?
-  coverImageId String?       @map("cover_image_id")
+  coverImageId String?      @map("cover_image_id")
   active       Boolean      @default(true)
-  votes        Int
-  votesAverage Float
+  votes        Int          @default(0)
+  votesAverage Float        @default(0.00)
   createdAt    DateTime     @default(now()) @map("created_at")
   deletedAt    DateTime?    @map("deleted_at")
-  Images       Images[] 
+  Images       Images[]
   Categories   Categories[]
 }
 

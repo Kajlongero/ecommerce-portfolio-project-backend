@@ -53,8 +53,8 @@ const updateUserSchema = joi.object({
 });
 
 const changeEmailSchema = joi.object({
-  rt: jwt.required(),
   email: joi.string().email().min(3).max(150).required(),
+  rt: jwt.required(),
 });
 
 const updatePasswordSchema = joi.object({

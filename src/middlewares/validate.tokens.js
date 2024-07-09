@@ -29,7 +29,7 @@ const ValidateAccessToken = (req, res, next) => {
 };
 
 const ValidateRefreshToken = async (req, res, next) => {
-  const token = req.body.rt || "";
+  const token = req.body.rt || req.headers["x-refresh-token-x"] || "";
 
   const { error: tokenError, data, message } = DecodeRefreshToken(token);
   if (tokenError) return next(new unauthorized(message));

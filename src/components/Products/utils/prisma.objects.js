@@ -10,10 +10,13 @@ const SelectProduct = {
     votes: true,
     votesAverage: true,
     createdAt: true,
+    coverImageId: true,
     Images: {
       select: {
         id: true,
         uri: true,
+        width: true,
+        height: true,
       },
     },
   },
@@ -22,15 +25,14 @@ const SelectProduct = {
 const SearchWithFilters = (filters) => ({
   AND: [
     { active: true },
-    { name: { search: query } },
-    { color: { contains: filters.color } },
+    { name: { search: filters.query.split(" ").join(" & ") } },
+    { color: filters.color ? { contains: filters.color } : undefined },
     { price: { gte: filters.price } },
     { votesAverage: { gte: filters.votes } },
     { stock: { gte: filters.stock } },
     {
       createdAt: {
         gte: filters.initialDate,
-        lte: filters.lastDate,
       },
     },
   ],

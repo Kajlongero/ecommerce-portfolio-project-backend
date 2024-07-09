@@ -1,8 +1,9 @@
 const multer = require("multer");
-const dirname = require("../dirname");
 const path = require("path");
 const { randomUUID } = require("crypto");
 const { notAcceptable } = require("@hapi/boom");
+
+const dirname = __dirname.split(path.sep).slice(0, __dirname.split(path.sep).length - 2).join(path.sep);
 
 const ALLOWED_IMAGES_MIMETYPES = ["image/png", "image/jpg", "image/jpeg"];
 
@@ -22,7 +23,7 @@ const ProfileImagesStorage = multer.diskStorage({
 
 const ProductImagesStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(dirname, "uploads", "images", "profile"));
+    cb(null, path.join(dirname, "uploads", "images", "products"));
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -33,7 +34,6 @@ const ProductImagesStorage = multer.diskStorage({
 });
 
 const UploadProfileImages = multer({
-  dest: path.join(dirname, "uploads", "images", "profile"),
   storage: ProfileImagesStorage,
   limits: {
     fileSize: 512000,
@@ -47,7 +47,6 @@ const UploadProfileImages = multer({
 });
 
 const UploadProductImages = multer({
-  dest: path.join(dirname, "uploads", "images", "products"),
   storage: ProductImagesStorage,
   limits: {
     fileSize: 8192000,

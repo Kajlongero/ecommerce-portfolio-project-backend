@@ -23,6 +23,9 @@ const {
   PasswordRecoveryTokenSchema: ConfirmEmailTokenSchema,
 } = require("../Auth/model");
 const UserController = require("./controller");
+const {
+  IndividualImageDimensions,
+} = require("../../middlewares/images.dimensions");
 
 // utils
 
@@ -68,6 +71,7 @@ router.post(
   ValidateAccessToken,
   ValidateRefreshToken,
   UploadProfileImages.single("cover-image"),
+  IndividualImageDimensions,
   async (req, res, next) => {
     try {
       const user = req.user;

@@ -1,5 +1,6 @@
 const boom = require("@hapi/boom");
 const multer = require("multer");
+const { MulterErrorsReducer } = require("../utils/multer.errors.reducer");
 
 /** Middleware that throws an error if is Boom Type or delegate the error to another middleware
  *
@@ -10,15 +11,15 @@ const multer = require("multer");
  * @returns {Express.Response}
  */
 
-const { Boom } = require("@hapi/boom");
-
 const MulterErrorHandler = (err, req, res, next) => {
   if (!(err instanceof multer.MulterError)) return next(err);
+
+  const { message } = MulterErrorsReducer(err);
 
   return res.status(400).json({
     statusCode: 400,
     error: "Error Uploading File",
-    message: err.message,
+    message: message,
   });
 };
 

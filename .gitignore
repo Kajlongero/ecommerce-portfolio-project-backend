@@ -5,3 +5,8 @@
 # prisma
 schema_copy.prisma
 migrations/
+
+*.jpg
+*.png
+*.jpeg
+*.gif

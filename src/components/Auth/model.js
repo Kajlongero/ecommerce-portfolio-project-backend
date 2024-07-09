@@ -56,12 +56,13 @@ const AuthorizePasswordChangeTokenSchema = joi.object({
 const SessionIdAndId = joi.object({
   id: uuid.optional(),
   sid: uuid.required(),
+  rt: jwt.required(),
 });
 
 const PatchUserRoleSchema = joi.object({
-  rt: jwt.required(),
   userId: uuid.required(),
   roleId: joi.number().integer().min(1).max(512),
+  rt: jwt.required(),
 });
 
 const PasswordRecoveryRequestSchema = joi.object({

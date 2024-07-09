@@ -59,24 +59,6 @@ router.get(
   }
 );
 
-router.get(
-  "/blacklisted-sessions",
-  ValidateAccessToken,
-  ValidateRefreshToken,
-  async (req, res, next) => {
-    try {
-      const { id } = req.query;
-
-      const user = req.user;
-      const sessions = await AuthController.blacklistedSessions(user, id);
-
-      SuccessResponseBody(req, res, sessions, 200);
-    } catch (e) {
-      next(e);
-    }
-  }
-);
-
 router.post(
   "/login",
   validateSchema(loginSchema, "body"),

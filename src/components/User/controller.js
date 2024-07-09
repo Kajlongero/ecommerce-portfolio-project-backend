@@ -41,6 +41,10 @@ const RESPONSE_MESSAGES = require("../../responses/response.messages");
 const { compareDates, setMinutesISOTime } = require("../../utils/set.time");
 const { allowed } = require("../Auth/utils/has.permissions");
 const { ConfirmEmailTemplate } = require("../../templates/confirm.email");
+const {
+  deleteImagesInBulk,
+} = require("../Shared/utils/delete.images.from.disk");
+const UPLOADS_DIRECTORY = require("./utils/profile.images.dir");
 
 class UserController extends SharedController {
   async createCustomer(data) {
@@ -271,7 +275,7 @@ class UserController extends SharedController {
     };
   }
 
-  async updateCoverImage(user, { filename, destination }) {
+  async updateCoverImage(user, image) {
     const exists = await prisma.users.findUnique({
       ...WhereId(user.uid),
       ...IncludeUserData,
@@ -284,8 +288,10 @@ class UserController extends SharedController {
         data: {
           CoverImage: {
             create: {
-              id: filename,
-              uri: destination,
+              id: image.filename,
+              uri: image.path,
+              width: image.width,
+              height: image.height,
             },
           },
         },
@@ -293,6 +299,9 @@ class UserController extends SharedController {
 
       return _updated;
     });
+
+    if (exists.profile?.coverImageId)
+      deleteImagesInBulk(UPLOADS_DIRECTORY, [exists.profile.coverImageId]);
 
     return {
       message: "Updated Successfully",

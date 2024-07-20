@@ -8,6 +8,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Status {
+  id        Int      @id @default(autoincrement())
+  type      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Orders    Orders[]
+}
+
+model StatusReason {
+  id        Int      @id @default(autoincrement())
+  reason    String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Orders    Orders[]
+}
+
+model StatusHistory {
+  id             Int              @id @default(autoincrement())
+  type           String           @unique
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  ProductHistory ProductHistory[]
+  OrderHistory   OrderHistory[]
+}
+
 model Users {
   id                  String                @id @default(uuid())
   profile             Profile?
@@ -16,6 +41,8 @@ model Users {
   updatedAt           DateTime              @updatedAt @map("updated_at")
   activeSessions      ActiveSessions[]
   blacklistedSessions BlacklistedSessions[]
+  OrderHistory        OrderHistory[]
+  Orders              Orders[]
 }
 
 model Profile {
@@ -27,10 +54,10 @@ model Profile {
   coverImageId String?  @map("cover_image_id")
   CoverImage   Images?  @relation(fields: [coverImageId], references: [id])
   balance      Float    @default(0.00)
-  userId       String   @unique @map("user_id")
+  userId       String?  @unique @map("user_id")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
-  user         Users    @relation(fields: [userId], references: [id])
+  user         Users?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model Auth {
@@ -46,13 +73,13 @@ model Auth {
   passwordRecoveryAttempts      Int            @default(0) @map("password_recovery_attempts")
   requestConfirmAttempts        Int            @default(0)
   timeToRequestConfirm          DateTime?      @map("time_to_request_confirm")
-  userId                        String         @unique @map("user_id")
-  roleId                        Int            @map("role_id")
+  userId                        String?        @unique @map("user_id")
+  roleId                        Int?           @map("role_id")
   createdAt                     DateTime       @default(now()) @map("created_at")
   updatedAt                     DateTime       @updatedAt @map("updated_at")
   deletedAt                     DateTime?      @map("deleted_at")
-  role                          Roles          @relation(fields: [roleId], references: [id])
-  Users                         Users          @relation(fields: [userId], references: [id])
+  role                          Roles?         @relation(fields: [roleId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  Users                         Users?         @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   AuthRecovery                  AuthRecovery[]
   AuthConfirm                   AuthConfirm[]
 }
@@ -62,7 +89,7 @@ model ActiveSessions {
   active    Boolean  @default(true)
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
-  Users     Users    @relation(fields: [userId], references: [id])
+  Users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BlacklistedSessions {
@@ -70,7 +97,7 @@ model BlacklistedSessions {
   hasLogout Boolean @default(false) @map("has_logout")
   isExpired Boolean @default(false) @map("is_expired")
   userId    String  @map("user_id")
-  Users     Users   @relation(fields: [userId], references: [id])
+  Users     Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AuthRecovery {
@@ -83,7 +110,7 @@ model AuthRecovery {
   changeAttempts Int      @default(0) @map("change_attempts")
   requestedAt    DateTime @map("requested_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-  auth           Auth     @relation(fields: [authId], references: [id])
+  auth           Auth     @relation(fields: [authId], references: [id], onDelete: Cascade)
 }
 
 model AuthConfirm {
@@ -93,7 +120,7 @@ model AuthConfirm {
   iv          String
   tag         Bytes
   requestedAt DateTime @map("requested_at")
-  auth        Auth     @relation(fields: [authId], references: [id])
+  auth        Auth     @relation(fields: [authId], references: [id], onDelete: Cascade)
 }
 
 model Permissions {
@@ -123,23 +150,46 @@ model Images {
 }
 
 model Products {
-  id           Int          @id @default(autoincrement())
-  name         String
-  description  String       @default("No description provided.")
-  sku          String
-  price        Float        @default(0.00)
-  stock        Int?         @default(0)
-  weight       Float?       @default(0.00)
-  dimensions   String?
-  color        String?
-  coverImageId String?      @map("cover_image_id")
-  active       Boolean      @default(true)
-  votes        Int          @default(0)
-  votesAverage Float        @default(0.00)
-  createdAt    DateTime     @default(now()) @map("created_at")
-  deletedAt    DateTime?    @map("deleted_at")
-  Images       Images[]
-  Categories   Categories[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  description    String           @default("No description provided.")
+  sku            String
+  price          Float            @default(0.00)
+  stock          Int?             @default(0)
+  weight         Float?           @default(0.00)
+  dimensions     String?
+  color          String?
+  coverImageId   String?          @map("cover_image_id")
+  active         Boolean          @default(true)
+  votes          Int              @default(0)
+  votesAverage   Float            @default(0.00)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  deletedAt      DateTime?        @map("deleted_at")
+  Images         Images[]
+  Categories     Categories[]
+  ProductsSelled ProductsSelled[]
+  ProductHistory ProductHistory[]
+}
+
+model ProductHistory {
+  id              Int            @id @default(autoincrement())
+  info            Json
+  quantity        Int
+  statusHistoryId Int?           @map("status_history_id")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  productId       Int?           @map("product_id")
+  products        Products?      @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  statusHistory   StatusHistory? @relation(fields: [statusHistoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+}
+
+model ProductsSelled {
+  id        Int       @id @default(autoincrement())
+  quantity  Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  productId Int?      @map("product_id")
+  products  Products? @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model Categories {
@@ -149,4 +199,29 @@ model Categories {
   updatedAt DateTime   @updatedAt @map("updated_at")
   deletedAt DateTime?  @map("deleted_at")
   Products  Products[]
+}
+
+model Orders {
+  id            String        @id @default(uuid())
+  total         Float         @default(0.00)
+  productsCount Int           @map("products_count")
+  orderReasonId Int?          @map("order_reason_id")
+  orderStatusId Int?          @map("order_status_id")
+  userId        String?       @map("user_id")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  orderStatus   Status?       @relation(fields: [orderStatusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  orderReason   StatusReason? @relation(fields: [orderReasonId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  user          Users?        @relation(fields: [userId], references: [id])
+}
+
+model OrderHistory {
+  id              Int            @id @default(autoincrement())
+  info            Json
+  statusHistoryId Int?           @map("status_history_id")
+  userId          String?        @map("user_id")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  statusHistory   StatusHistory? @relation(fields: [statusHistoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  user            Users?         @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }

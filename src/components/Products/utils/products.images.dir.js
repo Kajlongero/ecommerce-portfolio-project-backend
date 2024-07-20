@@ -12,6 +12,4 @@ const UPLOADS_DIRECTORY = path.join(
   "products"
 );
 
-console.log(UPLOADS_DIRECTORY);
-
 module.exports = UPLOADS_DIRECTORY;

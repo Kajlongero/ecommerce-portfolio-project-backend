@@ -83,6 +83,11 @@ class ProductsController extends SharedController {
     const transaction = await prisma.$transaction(async (tx) => {
       const sku = crypto.randomBytes(256).toString("hex").substring(0, 32);
 
+      const _toCreate = await tx.statusHistory.findFirst({
+        where: { type: { equals: "REGISTERING_PRODUCT" } },
+      });
+      if (!_toCreate) throw new boom.badImplementation();
+
       const _product = await tx.products.create({
         data: {
           ...productData,

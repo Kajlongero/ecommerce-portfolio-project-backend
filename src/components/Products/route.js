@@ -207,7 +207,7 @@ router.delete(
     }
   }
 );
-
+2;
 router.post(
   "/add-product-images/:productId",
   ValidateAccessToken,
@@ -248,6 +248,7 @@ router.patch(
 
       const removed = await ProductsController.removeProductImages(
         user,
+
         id,
         ids
       );

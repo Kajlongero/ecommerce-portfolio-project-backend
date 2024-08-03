@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: black;
+  --secondary-color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: white;
+    --secondary-color: black;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.theme-toggle__classic {
+  width: 32px;
+  height: 32px;
+}
